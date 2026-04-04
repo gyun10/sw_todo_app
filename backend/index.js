@@ -2,6 +2,10 @@ require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
+
+const JWT_SECRET = process.env.JWT_SECRET || 'dev_secret_key_change_in_prod';
 
 const app = express();
 app.use(cors());
@@ -12,43 +16,108 @@ mongoose.connect(process.env.MONGODB_URI)
   .then(() => console.log('MongoDB 연결 성공'))
   .catch(err => console.log(err));
 
-// Todo 스키마 정의 (우선순위와 마감일 추가!)
+// User 스키마
+const userSchema = new mongoose.Schema({
+  email: { type: String, required: true, unique: true },
+  password: { type: String, required: true },
+}, { timestamps: true });
+const User = mongoose.model('User', userSchema);
+
+// Todo 스키마 (userId 추가)
 const todoSchema = new mongoose.Schema({
+  userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
   title: { type: String, required: true },
   completed: { type: Boolean, default: false },
-  priority: { type: String, enum: ['High', 'Medium', 'Low'], default: 'Medium' }, // 우선순위
-  dueDate: { type: String, default: '' }, // 마감일 (YYYY-MM-DD 형식으로 저장)
+  due: { type: String, default: '' },
   notes: { type: String, default: '' },
-  category: { type: String, default: 'Tasks' }
-});
+  cat: { type: String, default: "일상" },
+}, { timestamps: true });
 const Todo = mongoose.model('Todo', todoSchema);
 
-// API 엔드포인트
-app.get('/api/todos', async (req, res) => {
-  const todos = await Todo.find();
+// Auth 미들웨어
+const authMiddleware = (req, res, next) => {
+  const token = req.headers.authorization?.split(' ')[1];
+  if (!token) return res.status(401).json({ message: '인증이 필요합니다.' });
+  try {
+    const decoded = jwt.verify(token, JWT_SECRET);
+    req.userId = decoded.userId;
+    next();
+  } catch {
+    res.status(401).json({ message: '유효하지 않은 토큰입니다.' });
+  }
+};
+
+// 회원가입
+app.post('/api/auth/signup', async (req, res) => {
+  const { email, password } = req.body;
+  if (!email || !password) return res.status(400).json({ message: '이메일과 비밀번호를 입력해주세요.' });
+  const existing = await User.findOne({ email });
+  if (existing) return res.status(400).json({ message: '이미 사용 중인 이메일입니다.' });
+  const hashed = await bcrypt.hash(password, 10);
+  const user = new User({ email, password: hashed });
+  await user.save();
+  const token = jwt.sign({ userId: user._id }, JWT_SECRET, { expiresIn: '7d' });
+  res.json({ token, email: user.email });
+});
+
+// 로그인
+app.post('/api/auth/login', async (req, res) => {
+  const { email, password } = req.body;
+  const user = await User.findOne({ email });
+  if (!user) return res.status(400).json({ message: '이메일 또는 비밀번호가 올바르지 않습니다.' });
+  const match = await bcrypt.compare(password, user.password);
+  if (!match) return res.status(400).json({ message: '이메일 또는 비밀번호가 올바르지 않습니다.' });
+  const token = jwt.sign({ userId: user._id }, JWT_SECRET, { expiresIn: '7d' });
+  res.json({ token, email: user.email });
+});
+
+// Todo API (인증 필요)
+app.get('/api/todos', authMiddleware, async (req, res) => {
+  const todos = await Todo.find({ userId: req.userId });
   res.json(todos);
 });
 
-app.post('/api/todos', async (req, res) => {
-  // 넘어오는 모든 데이터를 알아서 스키마에 맞춰 저장합니다!
-  const newTodo = new Todo(req.body); 
+app.post('/api/todos', authMiddleware, async (req, res) => {
+  const newTodo = new Todo({ ...req.body, userId: req.userId });
   await newTodo.save();
   res.json(newTodo);
 });
 
-app.put('/api/todos/:id', async (req, res) => {
-  // 프론트에서 보낸 수정된 데이터(제목, 메모, 날짜 등)를 통째로 덮어씌웁니다.
-  const todo = await Todo.findByIdAndUpdate(
-    req.params.id, 
-    { ...req.body }, 
+app.put('/api/todos/:id', authMiddleware, async (req, res) => {
+  const todo = await Todo.findOneAndUpdate(
+    { _id: req.params.id, userId: req.userId },
+    { ...req.body },
     { new: true }
   );
+  if (!todo) return res.status(404).json({ message: '할 일을 찾을 수 없습니다.' });
   res.json(todo);
 });
 
-app.delete('/api/todos/:id', async (req, res) => {
-  await Todo.findByIdAndDelete(req.params.id);
+app.delete('/api/todos/:id', authMiddleware, async (req, res) => {
+  await Todo.findOneAndDelete({ _id: req.params.id, userId: req.userId });
   res.json({ message: '삭제 완료' });
+});
+
+// 비밀번호 변경
+app.put('/api/auth/password', authMiddleware, async (req, res) => {
+  const { currentPassword, newPassword } = req.body;
+  if (!currentPassword || !newPassword)
+    return res.status(400).json({ message: '현재 비밀번호와 새 비밀번호를 입력해주세요.' });
+  if (newPassword.length < 6)
+    return res.status(400).json({ message: '새 비밀번호는 6자 이상이어야 합니다.' });
+  const user = await User.findById(req.userId);
+  const match = await bcrypt.compare(currentPassword, user.password);
+  if (!match) return res.status(400).json({ message: '현재 비밀번호가 올바르지 않습니다.' });
+  user.password = await bcrypt.hash(newPassword, 10);
+  await user.save();
+  res.json({ message: '비밀번호가 변경되었습니다.' });
+});
+
+// 계정 탈퇴
+app.delete('/api/auth/account', authMiddleware, async (req, res) => {
+  await Todo.deleteMany({ userId: req.userId });
+  await User.findByIdAndDelete(req.userId);
+  res.json({ message: '계정이 삭제되었습니다.' });
 });
 
 module.exports = app;

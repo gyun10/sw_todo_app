@@ -27,7 +27,7 @@ function greeting() {
   return "수고하셨어요 🌙";
 }
 
-export default function TodoPanel({ todos, addTodo, toggleTodo, updateTodo, deleteTodo, theme, onMenuClick, categories = [] }) {
+export default function TodoPanel({ todos, addTodo, toggleTodo, updateTodo, deleteTodo, theme, onMenuClick, categories = [], catFilter = "전체", onCatFilterChange }) {
   const [filter, setFilter] = useState("전체");
   const [modalOpen, setModalOpen] = useState(false);
   const [detailTodo, setDetailTodo] = useState(null);
@@ -44,6 +44,7 @@ export default function TodoPanel({ todos, addTodo, toggleTodo, updateTodo, dele
       return (daysLeft(a.due) ?? 999) - (daysLeft(b.due) ?? 999);
     })
     .filter(t => {
+      if (catFilter !== "전체" && t.cat !== catFilter) return false;
       if (filter === "진행중") return !t.completed;
       if (filter === "완료") return t.completed;
       if (filter === "마감임박") {
@@ -78,7 +79,17 @@ export default function TodoPanel({ todos, addTodo, toggleTodo, updateTodo, dele
         </button>
 
         <p className="text-xs mb-1" style={{ color: "rgba(255,255,255,0.75)" }}>{greeting()}</p>
-        <p className="text-lg font-medium mb-4" style={{ color: "white" }}>오늘의 할 일 ✨</p>
+        <div className="flex items-center gap-2 mb-4">
+          <p className="text-lg font-medium" style={{ color: "white" }}>오늘의 할 일 ✨</p>
+          {catFilter !== "전체" && (
+            <button
+              onClick={() => onCatFilterChange?.("전체")}
+              className="flex items-center gap-1 px-2 py-0.5 rounded-full text-xs"
+              style={{ background: "rgba(255,255,255,0.25)", color: "white" }}>
+              {catFilter} ✕
+            </button>
+          )}
+        </div>
 
         <div className="flex gap-2 mb-4">
           {[

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import axios from "axios";
 
-const API = import.meta.env.VITE_API_URL || "http://localhost:5000";
+const API = window.location.hostname === 'localhost' ? 'http://localhost:5000' : '';
 
 export default function AuthPage({ onLogin }) {
   const [mode, setMode] = useState("login"); // "login" | "signup"

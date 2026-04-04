@@ -1,0 +1,29 @@
+# Node.js 패키지 (용량이 너무 커서 AI 토큰을 낭비하게 만듭니다)
+node_modules/
+frontend/node_modules/
+backend/node_modules/
+
+# 빌드 결과물
+dist/
+build/
+frontend/dist/
+
+# 환경변수 및 보안 파일 (AI가 DB 비밀번호 등을 읽지 못하게 보안 처리)
+.env
+*.env
+.env.local
+
+# 로그 파일
+*.log
+npm-debug.log*
+
+# Git 및 에디터 설정
+.git/
+.vscode/
+.idea/
+.DS_Store
+
+# 패키지 잠금 파일 (package.json만 읽어도 충분함)
+package-lock.json
+frontend/package-lock.json
+backend/package-lock.json

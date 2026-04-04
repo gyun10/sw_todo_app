@@ -6,7 +6,9 @@ import CalendarPanel from "./components/CalendarPanel";
 import SettingsPanel from "./components/SettingsPanel";
 import AuthPage from "./components/AuthPage";
 
-const API = import.meta.env.VITE_API_URL || "http://localhost:5000";
+const API = window.location.hostname === 'localhost' 
+  ? 'http://localhost:5000' 
+  : '';
 
 const DEFAULT_CATS = ["공부", "개발", "일상"];
 

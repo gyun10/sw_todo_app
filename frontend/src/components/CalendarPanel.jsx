@@ -43,16 +43,28 @@ export default function CalendarPanel({ todos, theme, onMenuClick }) {
     : [];
 
   return (
-    <div style={{ fontFamily: "'Pretendard', sans-serif" }}>
-      <h2 className="text-lg mb-4 flex items-center gap-3" style={{ color: theme.main, fontWeight: 500 }}>
+    <div className="flex flex-col min-h-screen" style={{ fontFamily: "'Pretendard', sans-serif" }}>
+
+      {/* 헤더 배너 */}
+      <div className="relative overflow-hidden px-5 pt-5 pb-6 flex-shrink-0" style={{ background: theme.main }}>
+        {[
+          { w: 160, h: 160, top: -60, right: -40 },
+          { w: 80,  h: 80,  top: 20,  right: 80  },
+          { w: 50,  h: 50,  bottom: -10, right: 30 },
+        ].map((s, i) => (
+          <div key={i} className="absolute rounded-full pointer-events-none"
+            style={{ width: s.w, height: s.h, top: s.top, bottom: s.bottom,
+              right: s.right, background: "rgba(255,255,255,0.08)" }} />
+        ))}
         <button onClick={onMenuClick}
-          className="flex items-center justify-center w-9 h-9 rounded-xl text-base flex-shrink-0"
-          style={{ background: theme.light, color: theme.main, border: `1px solid ${theme.border}` }}>
+          className="flex items-center justify-center w-9 h-9 rounded-xl mb-3 text-base"
+          style={{ background: "rgba(255,255,255,0.2)", color: "white", border: "none" }}>
           ☰
         </button>
-        📅 달력
-      </h2>
+        <p className="text-lg font-medium" style={{ color: "white" }}>📅 달력</p>
+      </div>
 
+      <div className="flex-1 px-5 pt-5 pb-6">
       <div className="bg-white rounded-2xl p-4 border mb-4 w-2/3 mx-auto" style={{ borderColor: theme.border }}>
         <div className="flex justify-between items-center mb-4 text-sm" style={{ color: theme.main }}>
           <button onClick={() => changeMonth(-1)} className="px-2 py-1">◀</button>
@@ -139,6 +151,7 @@ export default function CalendarPanel({ todos, theme, onMenuClick }) {
           날짜를 클릭하면 마감 할 일을 확인해요
         </p>
       )}
+      </div>
     </div>
   );
 }

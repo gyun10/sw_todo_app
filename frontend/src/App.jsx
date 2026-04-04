@@ -155,7 +155,7 @@ export default function App() {
           { key: "settings", icon: "⚙️", label: "설정" },
         ].map(({ key, icon, label }) => (
           <button key={key}
-            onClick={() => { setTab(key); setSidebarOpen(false); }}
+            onClick={() => setTab(key)}
             className="flex items-center gap-2 px-3 py-2 rounded-xl text-sm text-left"
             style={{
               background: tab === key ? t.border : "transparent",
@@ -215,7 +215,7 @@ export default function App() {
       </aside>
 
       {/* 메인 */}
-      <main className="flex-1 flex flex-col min-h-screen">
+      <main className="flex-1 flex flex-col min-h-screen" style={{ background: t.light }}>
         <Panel
           todos={todos}
           addTodo={addTodo}

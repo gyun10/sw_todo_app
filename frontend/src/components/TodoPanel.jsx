@@ -107,7 +107,7 @@ export default function TodoPanel({ todos, addTodo, toggleTodo, updateTodo, dele
       </div>
 
       {/* 콘텐츠 */}
-      <div className="flex-1 px-5 pt-4 pb-6">
+      <div className="flex-1 px-5 pt-4 pb-6" style={{ background: theme.light }}>
         <div className="flex items-center gap-2 mb-4 flex-wrap">
           {["전체","진행중","완료","마감임박"].map(f => (
             <button key={f} onClick={() => setFilter(f)}

@@ -52,18 +52,18 @@ export default function SettingsPanel({
   };
 
   return (
-    <div className="px-5 pt-5 pb-8" style={{ fontFamily: "'Pretendard', sans-serif" }}>
+    <div className="px-5 pt-7 pb-8" style={{ fontFamily: "'Pretendard', sans-serif" }}>
 
       {/* 헤더 */}
-      <h2 className="mb-5 flex items-center gap-3">
+      <h2 className="mb-6 flex items-center gap-3">
         <button onClick={onMenuClick}
           className="flex items-center justify-center w-9 h-9 rounded-xl text-base flex-shrink-0"
           style={{ background: theme.light, color: theme.main, border: `1px solid ${theme.border}` }}>
           ☰
         </button>
         <div className="flex items-baseline gap-2">
-          <span className="text-lg font-semibold" style={{ color: theme.main }}>설정</span>
-          <span style={{ fontFamily: "'Dancing Script', cursive", fontSize: 18, color: theme.border, letterSpacing: 0.5 }}>Settings</span>
+          <span className="text-2xl font-bold" style={{ color: theme.main }}>설정</span>
+          <span style={{ fontFamily: "'Dancing Script', cursive", fontSize: 22, color: theme.border, letterSpacing: 0.5 }}>Settings</span>
         </div>
       </h2>
 

@@ -24,6 +24,7 @@ export default function App() {
   const [tab, setTab] = useState("todo");
   const [theme, setTheme] = useState("핑크");
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [catFilter, setCatFilter] = useState("전체");
 
   // 인증 상태
   const [userEmail, setUserEmail] = useState(null);
@@ -155,7 +156,7 @@ export default function App() {
           { key: "settings", icon: "⚙️", label: "설정" },
         ].map(({ key, icon, label }) => (
           <button key={key}
-            onClick={() => { setTab(key); setSidebarOpen(false); }}
+            onClick={() => setTab(key)}
             className="flex items-center gap-2 px-3 py-2 rounded-xl text-sm text-left"
             style={{
               background: tab === key ? t.border : "transparent",
@@ -174,16 +175,23 @@ export default function App() {
           color: { 공부:"#378ADD", 개발:"#7F77DD", 일상:"#639922" }[name]
             ?? ["#E28B4A","#4A9E88","#D45E8B","#8BAA33","#C25E5E","#5E8BC2"][i % 6],
         }))].map(({ name, icon, color }) => (
-          <div key={name} className="flex items-center gap-2 px-3 py-2 rounded-xl text-sm text-gray-400">
+          <button key={name}
+            onClick={() => { setCatFilter(name); setTab("todo"); }}
+            className="flex items-center gap-2 px-3 py-2 rounded-xl text-sm w-full text-left"
+            style={{
+              background: catFilter === name && tab === "todo" ? t.border : "transparent",
+              color: catFilter === name && tab === "todo" ? t.main : "#999",
+              fontWeight: catFilter === name && tab === "todo" ? 500 : 400,
+            }}>
             {icon
               ? <span style={{ fontSize: 13 }}>{icon}</span>
-              : <div className="w-2 h-2 rounded-full" style={{ background: color }} />
+              : <div className="w-2 h-2 rounded-full flex-shrink-0" style={{ background: color }} />
             }
             <span className="truncate">{name}</span>
             <span className="ml-auto text-xs flex-shrink-0" style={{ color: t.border }}>
               {name === "전체" ? todos.length : todos.filter(td => td.cat === name).length}
             </span>
-          </div>
+          </button>
         ))}
 
         {/* 테마 + 로그아웃 */}
@@ -215,7 +223,7 @@ export default function App() {
       </aside>
 
       {/* 메인 */}
-      <main className="flex-1 flex flex-col min-h-screen">
+      <main className="flex-1 flex flex-col min-h-screen" style={{ background: t.light }}>
         <Panel
           todos={todos}
           addTodo={addTodo}
@@ -233,6 +241,8 @@ export default function App() {
           userEmail={userEmail}
           onDeleteAccount={handleDeleteAccount}
           onLogout={handleLogout}
+          catFilter={catFilter}
+          onCatFilterChange={setCatFilter}
         />
       </main>
     </div>

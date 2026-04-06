@@ -43,6 +43,7 @@ export default function CalendarPanel({ todos, theme, onMenuClick }) {
     : [];
 
   return (
+<<<<<<< HEAD
     <div className="flex flex-col min-h-screen" style={{ fontFamily: "'Pretendard', sans-serif" }}>
 
       {/* 헤더 배너 */}
@@ -56,13 +57,25 @@ export default function CalendarPanel({ todos, theme, onMenuClick }) {
             style={{ width: s.w, height: s.h, top: s.top, bottom: s.bottom,
               right: s.right, background: "rgba(255,255,255,0.08)" }} />
         ))}
+=======
+    <div style={{ fontFamily: "'Pretendard', sans-serif" }}>
+      <h2 className="mb-4 flex items-center gap-3">
+>>>>>>> a01e410 (페이지 폰트 수정)
         <button onClick={onMenuClick}
           className="flex items-center justify-center w-9 h-9 rounded-xl mb-3 text-base"
           style={{ background: "rgba(255,255,255,0.2)", color: "white", border: "none" }}>
           ☰
         </button>
+<<<<<<< HEAD
         <p className="text-lg font-medium" style={{ color: "white" }}>📅 달력</p>
       </div>
+=======
+        <div className="flex items-baseline gap-2">
+          <span className="text-lg font-semibold" style={{ color: theme.main }}>달력</span>
+          <span style={{ fontFamily: "'Dancing Script', cursive", fontSize: 18, color: theme.border, letterSpacing: 0.5 }}>Calendar</span>
+        </div>
+      </h2>
+>>>>>>> a01e410 (페이지 폰트 수정)
 
       <div className="flex-1 px-5 pt-5 pb-6">
       <div className="bg-white rounded-2xl p-4 border mb-4 w-2/3 mx-auto" style={{ borderColor: theme.border }}>

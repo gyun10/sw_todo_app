@@ -44,13 +44,16 @@ export default function CalendarPanel({ todos, theme, onMenuClick }) {
 
   return (
     <div style={{ fontFamily: "'Pretendard', sans-serif" }}>
-      <h2 className="text-lg mb-4 flex items-center gap-3" style={{ color: theme.main, fontWeight: 500 }}>
+      <h2 className="mb-4 flex items-center gap-3">
         <button onClick={onMenuClick}
           className="flex items-center justify-center w-9 h-9 rounded-xl text-base flex-shrink-0"
           style={{ background: theme.light, color: theme.main, border: `1px solid ${theme.border}` }}>
           ☰
         </button>
-        📅 달력
+        <div className="flex items-baseline gap-2">
+          <span className="text-lg font-semibold" style={{ color: theme.main }}>달력</span>
+          <span style={{ fontFamily: "'Dancing Script', cursive", fontSize: 18, color: theme.border, letterSpacing: 0.5 }}>Calendar</span>
+        </div>
       </h2>
 
       <div className="bg-white rounded-2xl p-4 border mb-4 w-2/3 mx-auto" style={{ borderColor: theme.border }}>
